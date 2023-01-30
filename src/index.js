@@ -1,15 +1,54 @@
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { Notify } from 'notiflix';
 import debounce from 'lodash.debounce';
+import fetchCountries from './fetch-countries';
+import showCountryInfo from './showCountryInfo';
+import showCountryList from './showCountryList';
 import './css/styles.css';
 
 const DEBOUNCE_DELAY = 300;
 
-const country = document.getElementById('search-box');
-const link = `https://restcountries.com/v3.1/name/${country}`;
+const INFO_MSG = 'Too many matches found. Please enter a more specific name.';
+const ERROR_MSG = 'Oops, there is no country with that name.';
+
+const refs = {
+	inputCountry: document.getElementById('search-box'),
+	countryList: document.querySelector('.country-list'),
+	countryInfo: document.querySelector('.country-info'),
+}
 
 function showCountries(event) {
 	let countryName = event.target.value;
-	console.log(countryName);
+
+	if (countryName === '') {
+		refs.countryList.innerHTML = '';
+		refs.countryInfo.innerHTML = '';
+		return;
+	}
+
+	fetchCountries(countryName)
+		.then(country => {
+			if (country.status == '404') {
+				throw new Error(ERROR_MSG);
+			}
+
+			if (country.length === 1) {
+				refs.countryList.innerHTML = '';
+				refs.countryInfo.innerHTML = showCountryInfo(country);
+			}
+
+			if (country.length > 2 && country.length < 10) {
+				refs.countryInfo.innerHTML = '';
+				refs.countryList.innerHTML = showCountryList(country);
+			}
+
+			if (country.length > 10) {
+				Notify.info(INFO_MSG)
+			}
+		})
+		.catch(error => {
+			Notify.failure(ERROR_MSG);
+			console.log(error);
+		});
 }
 
-country.addEventListener('input', debounce(showCountries, DEBOUNCE_DELAY));
+refs.inputCountry.addEventListener('input', debounce(showCountries, DEBOUNCE_DELAY));

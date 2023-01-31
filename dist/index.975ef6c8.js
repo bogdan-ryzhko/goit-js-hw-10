@@ -522,7 +522,7 @@ const refs = {
     countryInfo: document.querySelector(".country-info")
 };
 function showCountries(event) {
-    let countryName = event.target.value;
+    let countryName = event.target.value.trim();
     if (countryName === "") {
         refs.countryList.innerHTML = "";
         refs.countryInfo.innerHTML = "";

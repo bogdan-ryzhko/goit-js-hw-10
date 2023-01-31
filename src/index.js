@@ -16,7 +16,7 @@ const refs = {
 }
 
 function showCountries(event) {
-	let countryName = event.target.value;
+	let countryName = event.target.value.trim();
 
 	if (countryName === '') {
 		refs.countryList.innerHTML = '';

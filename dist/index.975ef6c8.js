@@ -516,7 +516,6 @@ var _showCountryListDefault = parcelHelpers.interopDefault(_showCountryList);
 var _stylesCss = require("./css/styles.css");
 const DEBOUNCE_DELAY = 300;
 const INFO_MSG = "Too many matches found. Please enter a more specific name.";
-const ERROR_MSG = "Oops, there is no country with that name.";
 const refs = {
     inputCountry: document.getElementById("search-box"),
     countryList: document.querySelector(".country-list"),
@@ -530,7 +529,6 @@ function showCountries(event) {
         return;
     }
     (0, _fetchCountriesDefault.default)(countryName).then((country)=>{
-        if (country.status == "404") throw new Error(ERROR_MSG);
         if (country.length === 1) {
             refs.countryList.innerHTML = "";
             refs.countryInfo.innerHTML = (0, _showCountryInfoDefault.default)(country);
@@ -541,7 +539,6 @@ function showCountries(event) {
         }
         if (country.length > 10) (0, _notiflix.Notify).info(INFO_MSG);
     }).catch((error)=>{
-        (0, _notiflix.Notify).failure(ERROR_MSG);
         console.log(error);
     });
 }
@@ -866,9 +863,17 @@ exports.export = function(dest, destName, get) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _notiflix = require("notiflix");
+const ERROR_MSG = "Oops, there is no country with that name.";
 function fetchCountries(name) {
-    const link = `https://restcountries.com/v3.1/name/${name}`;
-    return fetch(link).then((response)=>response.json()).catch((error)=>(0, _notiflix.Notify).failure("flafn"));
+    const FIELDS_OPTIONS = "name,capital,population,flags,languages";
+    const link = `https://restcountries.com/v3.1/name/${name}?fields=${FIELDS_OPTIONS}`;
+    return fetch(link).then((response)=>{
+        if (!response.ok) throw new Error(response.status);
+        return response.json();
+    }).catch((error)=>{
+        (0, _notiflix.Notify).failure(ERROR_MSG);
+        return error;
+    });
 }
 exports.default = fetchCountries;
 
@@ -1636,7 +1641,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 function showCountryInfo(countryArray) {
     return countryArray.map((country)=>{
-        const languages = Object.values(country.languages).map((language)=>language).join(", ");
+        const languages = Object.values(country.languages).join(", ");
         return `<div class="country-info__item">
 			<div class="country-info__item-top">
 				<img width="50" src="${country.flags.svg}" alt="${country.name.official}">

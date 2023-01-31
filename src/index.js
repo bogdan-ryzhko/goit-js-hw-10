@@ -8,7 +8,6 @@ import './css/styles.css';
 const DEBOUNCE_DELAY = 300;
 
 const INFO_MSG = 'Too many matches found. Please enter a more specific name.';
-const ERROR_MSG = 'Oops, there is no country with that name.';
 
 const refs = {
 	inputCountry: document.getElementById('search-box'),
@@ -27,10 +26,6 @@ function showCountries(event) {
 
 	fetchCountries(countryName)
 		.then(country => {
-			if (country.status == '404') {
-				throw new Error(ERROR_MSG);
-			}
-
 			if (country.length === 1) {
 				refs.countryList.innerHTML = '';
 				refs.countryInfo.innerHTML = showCountryInfo(country);
@@ -46,8 +41,7 @@ function showCountries(event) {
 			}
 		})
 		.catch(error => {
-			Notify.failure(ERROR_MSG);
-			console.log(error);
+			console.log(error)
 		});
 }
 

@@ -1,8 +1,7 @@
 function showCountryInfo(countryArray) {
 	return countryArray.map(country => {
 
-		const languages = Object.values(country.languages)
-			.map(language => language).join(', ');
+		const languages = Object.values(country.languages).join(', ');
 
 		return `<div class="country-info__item">
 			<div class="country-info__item-top">

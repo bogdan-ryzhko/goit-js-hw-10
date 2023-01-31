@@ -22,6 +22,7 @@ body {
 ul,
 li {
   list-style: none;
+  padding: 0;
 }
 
 .country-info__item-top,
